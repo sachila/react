@@ -1,13 +1,10 @@
-import { Checkbox } from "@material-ui/core";
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useMemo } from "react";
+import { Form } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { CategoryStructure } from "../../models/CategoryStructure";
 import { handleSelectAll } from "../../services/CategoryService";
 import { updateCategory } from "../../store/actions";
-import {
-  ChildCategoryWrapper,
-  FormControlLabelSelectAllContainer,
-} from "../../styles/elements";
+import { ChildCategoryCheckboxWrapper } from "../../styles/elements";
 import { CategoryCheckboxFacets } from "./CategoryCheckboxFacets";
 
 interface Props {
@@ -17,6 +14,10 @@ interface Props {
 export const CategoryChildCheckboxFacets: React.FC<Props> = (props) => {
   const { category } = props;
   const dispatch = useDispatch();
+  const hasChildCategories = useMemo(
+    () => category.childCategories && category.childCategories.length > 0,
+    [category]
+  );
 
   if (!category || !category.childCategories) {
     return null;
@@ -46,14 +47,11 @@ export const CategoryChildCheckboxFacets: React.FC<Props> = (props) => {
     );
   };
 
-  const hasChildCategories: boolean =
-    category.childCategories && category.childCategories.length > 0;
-
   return (
     <>
       {hasChildCategories && (
-        <ChildCategoryWrapper>
-          <FormControlLabelSelectAllContainer
+        <ChildCategoryCheckboxWrapper>
+          {/* <FormControlLabelSelectAllContainer
             control={
               <Checkbox
                 key={`select_all-${category.id} - ${category.name}`}
@@ -67,8 +65,16 @@ export const CategoryChildCheckboxFacets: React.FC<Props> = (props) => {
               />
             }
             label="Select All"
+          /> */}
+          <Form.Check
+            type="checkbox"
+            key={`select_all-${category.id} - ${category.name}`}
+            id={`select_all - ${category.id}`}
+            checked={allChildrensAreSelected(category)}
+            onChange={(e) => handleSelectAllChange(e, category.childCategories)}
+            label="Select All"
           />
-        </ChildCategoryWrapper>
+        </ChildCategoryCheckboxWrapper>
       )}
       {!category.deleted && (
         <CategoryCheckboxFacets
